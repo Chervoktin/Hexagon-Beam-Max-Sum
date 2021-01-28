@@ -37,97 +37,49 @@ function getHexagon(seq, n) {
   return result;
 }
 
-function get(arr, i, r, size) {
-  let s = (size * 2 - 1) - arr.length;
-  if (r > size - 1) {
-    if (i < s) {
+function getLeftDiagonalItem(arrOfRow, indexOfDiagonal, indexOfRow, n) {
+  let offset = (n * 2 - 1) - arrOfRow.length;
+  if (indexOfRow > n - 1) {
+    if (indexOfDiagonal < offset) {
       return null;
     } else {
-      return arr[i - s];
+      return arrOfRow[indexOfDiagonal - offset];
     }
   } else {
-    if (i > arr.length - 1) {
+    if (indexOfDiagonal > arrOfRow.length - 1) {
       return null;
     } else {
-      return arr[i];
+      return arrOfRow[indexOfDiagonal];
     }
   }
 }
 
-function getRight(arr, i, r, size) {
-  let s = (size * 2 - 1) - arr.length;
-  if (r < size - 1) {
-    if (i < s) {
+function getRightDiagonalItem(arrOfRow, indexOfDiagonal, indexOfRow, n) {
+  let s = (n * 2 - 1) - arrOfRow.length;
+  if (indexOfRow < n - 1) {
+    if (indexOfDiagonal < s) {
       return null;
     } else {
-      return arr[i - s];
+      return arrOfRow[indexOfDiagonal - s];
     }
   } else {
-    if (i > arr.length - 1) {
+    if (indexOfDiagonal > arrOfRow.length - 1) {
       return null;
     } else {
-      return arr[i];
+      return arrOfRow[indexOfDiagonal];
     }
   }
 }
 
-function getMaxOfLeftDiagonal(grid, n) {
-  let max = getSumOfLeftDiagonal(grid, 0, n);
-  for (let i = 1; i != (n * 2 - 1); i++) {
-    let sum = getSumOfLeftDiagonal(grid, i, n);
+function getMax(grid, funOfSum, n) {
+  let max = funOfSum(grid, 0, n);
+  for (let indexOfDiagonal = 1; indexOfDiagonal != (n * 2 - 1); indexOfDiagonal++) {
+    let sum = funOfSum(grid, indexOfDiagonal, n);
     if (sum > max) {
       max = sum;
     }
   }
   return max;
-}
-
-function getMaxOfRightDiagonal(grid, n) {
-  let max = getSumOfRightDiagonal(grid, 0, n);
-  for (let i = 1; i != (n * 2 - 1); i++) {
-    let sum = getSumOfRightDiagonal(grid, i, n);
-    if (sum > max) {
-      max = sum;
-    }
-  }
-  return max;
-}
-function getMaxHorizontal(grid) {
-  let max = 0;
-  grid.forEach(function (row) {
-    let sum = getSumHorizontal(row);
-    if (sum > max) {
-      max = sum;
-    }
-  });
-  return max;
-}
-
-function getMax(grid, fun, n) {
-  let max = fun(grid, 0, n);
-  for (let i = 1; i != (n * 2 - 1); i++) {
-    let sum = fun(grid, i, n);
-    if (sum > max) {
-      max = sum;
-    }
-  }
-  return max;
-}
-
-function getSumOfRightDiagonal(grid, indexOfDiagonal, n) {
-  let sum = 0;
-  for (let row = 0; row != grid.length; row++) {
-    sum += getRight(grid[row], indexOfDiagonal, row, n);
-  };
-  return sum;
-}
-
-function getSumOfLeftDiagonal(grid, indexOfDiagonal, n) {
-  let sum = 0;
-  for (let row = 0; row != grid.length; row++) {
-    sum += get(grid[row], indexOfDiagonal, row, n);
-  };
-  return sum;
 }
 
 function getSumHorizontal(row) {
@@ -139,11 +91,31 @@ function getSumHorizontal(row) {
 }
 
 
+function getSumFun(funOfGettingItemOfDiagonal) {
+  return function (grid, indexOfDiagonal, n, fun) {
+    let sum = 0;
+    for (let row = 0; row != grid.length; row++) {
+      sum += funOfGettingItemOfDiagonal(grid[row], indexOfDiagonal, row, n);
+    };
+    return sum;
+  }
+}
+
+function getMaxHorizontal(grid) {
+  let max = Number.MIN_SAFE_INTEGER;
+  grid.forEach(function (row) {
+    let sum = getSumHorizontal(row);
+    if (sum > max) {
+      max = sum;
+    }
+  });
+  return max;
+}
 
 function maxHexagonBeam(n, seq) {
   let hex = getHexagon(seq, n);
-  let leftMax = getMax(hex, getSumOfLeftDiagonal, n);
-  let rightMax = getMax(hex, getSumOfRightDiagonal, n);
-  let horizontalMax = getMaxHorizontal(grid);
+  let leftMax = getMax(hex, getSumFun(getLeftDiagonalItem), n);
+  let rightMax = getMax(hex, getSumFun(getRightDiagonalItem), n);
+  let horizontalMax = getMax(hex, getMaxHorizontal, n);
   return Math.max(leftMax, rightMax, horizontalMax);
 }
