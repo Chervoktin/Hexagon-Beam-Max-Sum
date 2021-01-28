@@ -7,7 +7,7 @@ function generatorOfIndex(length) {
 }
 
 function generatorOfLength(length) {
-  var c = length+1;
+  var c = length + 1;
   var i = -1;
   return function () {
     c += i;
@@ -17,12 +17,12 @@ function generatorOfLength(length) {
     if (c == (length * 2 - 1)) {
       i = i * -1;
     }
-    
+
     return c;
   }
 }
 
-function getHexagon(seq,n) {
+function getHexagon(seq, n) {
   let getLength = generatorOfLength(n);
   let getIndex = generatorOfIndex(seq.length);
   let result = [];
@@ -92,6 +92,27 @@ function getMaxOfRightDiagonal(grid, n) {
   }
   return max;
 }
+function getMaxHorizontal(grid) {
+  let max = 0;
+  grid.forEach(function (row) {
+    let sum = getSumHorizontal(row);
+    if (sum > max) {
+      max = sum;
+    }
+  });
+  return max;
+}
+
+function getMax(grid, fun, n) {
+  let max = fun(grid, 0, n);
+  for (let i = 1; i != (n * 2 - 1); i++) {
+    let sum = fun(grid, i, n);
+    if (sum > max) {
+      max = sum;
+    }
+  }
+  return max;
+}
 
 function getSumOfRightDiagonal(grid, indexOfDiagonal, n) {
   let sum = 0;
@@ -117,21 +138,12 @@ function getSumHorizontal(row) {
   return sum;
 }
 
-function getMaxHorizontal(grid) {
-  let max = 0;
-  grid.forEach(function (row) {
-    let sum = getSumHorizontal(row);
-    if (sum > max) {
-      max = sum;
-    }
-  });
-  return max;
-}
+
 
 function maxHexagonBeam(n, seq) {
-  let hex = getHexagon(seq,n);
-  let leftMax = getMaxOfLeftDiagonal(hex, n);
-  let rightMax = getMaxOfRightDiagonal(hex, n);
-  let horizontalMax = getMaxHorizontal(hex);
+  let hex = getHexagon(seq, n);
+  let leftMax = getMax(hex, getSumOfLeftDiagonal, n);
+  let rightMax = getMax(hex, getSumOfRightDiagonal, n);
+  let horizontalMax = getMaxHorizontal(grid);
   return Math.max(leftMax, rightMax, horizontalMax);
 }
